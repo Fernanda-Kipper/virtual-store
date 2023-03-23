@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+    <title>Vitrine</title>
+</head>
+<body onload="execute()">
+    <div class="container">
+        <h1>Seja bem vindo a Vitrine</h1>
+        <div class="content">
+            <div class="element">
+                <canvas id="element-1"></canvas>
+                <div class="btn-box">
+                    <button onclick="zoomOut(0)">zoom out</button>
+                    <button onclick="zoomIn(0)">zoom in</button>
+                </div>
+            </div>
+            <div class="element">
+                <canvas id="element-2"></canvas>
+                <div class="btn-box">
+                    <button onclick="zoomOut(1)">zoom out</button>
+                    <button onclick="zoomIn(1)">zoom in</button>
+                </div>
+            </div>
+            <div class="element">
+                <canvas id="element-3"></canvas>
+                <div class="btn-box">
+                    <button onclick="zoomOut(2)">zoom out</button>
+                    <button onclick="zoomIn(2)">zoom in</button>
+                </div>
+            </div>
+            <div class="element">
+                <canvas id="element-4"></canvas>
+                <div class="btn-box">
+                    <button onclick="zoomOut(3)">zoom out</button>
+                    <button onclick="zoomIn(3)">zoom in</button>
+                </div>
+            </div>
+            <div class="element">
+                <canvas id="element-5"></canvas>
+                <div class="btn-box">
+                    <button onclick="zoomOut(4)">zoom out</button>
+                    <button onclick="zoomIn(4)">zoom in</button>
+                </div>
+            </div>
+            <div class="element">
+                <canvas id="element-6"></canvas>
+                <div class="btn-box">
+                    <button onclick="zoomOut(5)">zoom out</button>
+                    <button onclick="zoomIn(5)">zoom in</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="gl-matrix.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>
