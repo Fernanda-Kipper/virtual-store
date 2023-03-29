@@ -1,321 +1,237 @@
-const { vec2, vec3, mat3, mat4 } = glMatrix;
-
 var elementsArray = [
-    "element-1",
-    "element-2",
-    "element-3",
-    "element-4",
-    "element-5",
-    "element-6",
+    {
+      id: "element-1",
+      obj: "gun.obj",
+      texture: "gun-texture.png"
+    },
+    {
+      id: "element-2",
+      obj: "box.obj",
+      texture: "box-texture.png"
+    },
+    {
+      id: "element-3",
+      obj: "gun.obj",
+      texture: "gun-texture.png"
+    },
+    {
+      id: "element-4",
+      obj: "box.obj",
+      texture: "box-texture.png"
+    },
+    {
+      id: "element-5",
+      obj: "gun.obj",
+      texture: "gun-texture.png"
+    },
+    {
+      id: "element-6",
+      obj: "box.obj",
+      texture: "box-texture.png"
+    }
 ];
 
 var glContextArray = []
 
-var vertexShaderText = `
-    precision mediump float;
+var vertexShaderText = `#version 300 es
+  in vec4 a_position;
+  in vec3 a_normal;
+  in vec2 a_texcoord;
 
-    attribute vec3 vertPosition;
-    attribute vec3 vertColor;
+  uniform mat4 u_projection;
+  uniform mat4 u_view;
+  uniform mat4 u_world;
 
-    varying vec3 fragColor;
+  out vec2 v_texcoord;
 
-    uniform mat4 mWorld;
-    uniform mat4 mView;
-    uniform mat4 mProj;
-
-    void main(){
-        fragColor = vertColor;
-        gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0);
-    }
+  void main() {
+    gl_Position = u_projection * u_view * u_world * a_position;
+    v_texcoord = a_texcoord;
+  }
 `
 
-var fragmentShaderText = `
-    precision mediump float;
+var fragmentShaderText = `#version 300 es
+  precision mediump float;
 
-    varying vec3 fragColor;
-    
-    void main () {
-        gl_FragColor = vec4(fragColor, 1.0);
-    }
+  in vec2 v_texcoord;
+
+  uniform sampler2D u_texture;
+
+  out vec4 outColor;
+
+  void main () {
+    outColor = texture(u_texture, v_texcoord);
+  }
 `
-
-var triangleVertices = [
-	// X, Y, RGB
-	0.0, 0.5, 0.0,     1.0, 1.0, 0.0,
-	-0.5, -0.5, 0.0,   0.7,0.0, 1.0,
-	0.5, -0.5, 0.0,    0.4, 1.0, 0.6
-]
-
-var boxVertices = 
-[ // X, Y, Z           R, G, B
-    // Top
-    -1.0, 1.0, -1.0,   0.5, 0.5, 0.5,
-    -1.0, 1.0, 1.0,    0.5, 0.5, 0.5,
-    1.0, 1.0, 1.0,     0.5, 0.5, 0.5,
-    1.0, 1.0, -1.0,    0.5, 0.5, 0.5,
-
-    // Left
-    -1.0, 1.0, 1.0,    0.75, 0.25, 0.5,
-    -1.0, -1.0, 1.0,   0.75, 0.25, 0.5,
-    -1.0, -1.0, -1.0,  0.75, 0.25, 0.5,
-    -1.0, 1.0, -1.0,   0.75, 0.25, 0.5,
-
-    // Right
-    1.0, 1.0, 1.0,    0.25, 0.25, 0.75,
-    1.0, -1.0, 1.0,   0.25, 0.25, 0.75,
-    1.0, -1.0, -1.0,  0.25, 0.25, 0.75,
-    1.0, 1.0, -1.0,   0.25, 0.25, 0.75,
-
-    // Front
-    1.0, 1.0, 1.0,    1.0, 0.0, 0.15,
-    1.0, -1.0, 1.0,    1.0, 0.0, 0.15,
-    -1.0, -1.0, 1.0,    1.0, 0.0, 0.15,
-    -1.0, 1.0, 1.0,    1.0, 0.0, 0.15,
-
-    // Back
-    1.0, 1.0, -1.0,    0.0, 1.0, 0.15,
-    1.0, -1.0, -1.0,    0.0, 1.0, 0.15,
-    -1.0, -1.0, -1.0,    0.0, 1.0, 0.15,
-    -1.0, 1.0, -1.0,    0.0, 1.0, 0.15,
-
-    // Bottom
-    -1.0, -1.0, -1.0,   0.5, 0.5, 1.0,
-    -1.0, -1.0, 1.0,    0.5, 0.5, 1.0,
-    1.0, -1.0, 1.0,     0.5, 0.5, 1.0,
-    1.0, -1.0, -1.0,    0.5, 0.5, 1.0,
-];
-
-var boxIndices =
-[
-    // Top
-    0, 1, 2,
-    0, 2, 3,
-
-    // Left
-    5, 4, 6,
-    6, 4, 7,
-
-    // Right
-    8, 9, 10,
-    8, 10, 11,
-
-    // Front
-    13, 12, 14,
-    15, 14, 12,
-
-    // Back
-    16, 17, 18,
-    16, 18, 19,
-
-    // Bottom
-    21, 20, 22,
-    22, 20, 23
-];
 
 function moveObject(elementIndex){
     let glElement = glContextArray[elementIndex];
-    initialize(glElement);
+    initializeLoop(glElement);
 }
 
 function stopObject(elementIndex){
-    let { requestId } = glContextArray[elementIndex];
-    cancelAnimationFrame(requestId)
+  let { requestId } = glContextArray[elementIndex];
+  cancelAnimationFrame(requestId)
 }
 
-async function execute(){
-    for(let i = 0; i < elementsArray.length; i++){
-        const elementId = elementsArray[i];
-        const element = document.getElementById(elementId);
-
-        element.addEventListener('mouseover', () => moveObject(i));
-        element.addEventListener('mouseout', () => stopObject(i));
-
-        glContextArray.push(glFactory(elementId));
-    }
+function degToRad(deg) {
+  return deg * Math.PI / 180;
 }
 
-function initialize(glElement){
-    let { gl, worldMatrix, matWorldUniformLocation } = glElement;
+async function executeProgram(){
+  for(let i = 0; i < elementsArray.length; i++){
+    const canvaElement = elementsArray[i];
+    const element = document.getElementById(canvaElement.id);
 
-    let identityMatrix = new Float32Array(16);
-    mat4.identity(identityMatrix);
+    const response = await fetch('/resources/' + canvaElement.obj);
+    const text = await response.text();
+    const data = parseOBJ(text);
 
-    gl.clearColor(0, 0, 0, 1);
+    element.addEventListener('mouseover', () => moveObject(i));
+    element.addEventListener('mouseout', () => stopObject(i));
+
+    glContextArray.push(glFactory(canvaElement.id, canvaElement.texture, data));
+  }
+}
+
+function initializeLoop(glElement){
+    let { gl, meshProgramInfo, bufferInfo } = glElement;
+
     gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
 
-    let loop = function (){
-        var angle = performance.now() / 1000 / 6 * 2 * Math.PI;
-
-        // rodando o worldMatrix, usando a identityMatrix e o tempo de angle
-        // e quero rodar no eixo Y, então por isso  [0,1,0]
-        mat4.rotate(worldMatrix, identityMatrix, angle, [0,1,0]);
-        gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
-
-        // limpando o canva cada loop
-        gl.clearColor(0, 0, 0, 1);
-        gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-
-        gl.enable(gl.CULL_FACE);
-        gl.enable(gl.DEPTH_TEST);
-        // desenhando os vertices no canva
-        gl.drawElements(gl.TRIANGLES, boxIndices.length, gl.UNSIGNED_SHORT, 0);
-
-        // loop de renderização;
-        glElement.requestId = requestAnimationFrame(loop);
+    function loop(time) {
+      time = performance.now() / 1000 / 6 * 2 * Math.PI;  // convert to seconds
+  
+      twgl.setUniforms(meshProgramInfo, {
+        u_world: m4.yRotation(time)
+      });
+  
+      twgl.drawBufferInfo(gl, bufferInfo);
+  
+      glElement.requestId = requestAnimationFrame(loop);
     }
 
     glElement.requestId = requestAnimationFrame(loop);
 }
 
-function glFactory(elementId){
-	let canvas = document.getElementById(elementId)
-	let gl = canvas.getContext("webgl")
+function glFactory(elementId, texturePath, data){
+	var canvas = document.getElementById(elementId)
+	var gl = canvas.getContext("webgl2")
 
 	if(!gl){
-		// some browsers does not support the other format
-		// like Edge
 		gl = canvas.getContext("experimental-webgl")
 	}
 
-	// ajustando o canva pra cobrir toda tela
 	canvas.width = 350;
 	canvas.height = 250;
 
-	// ajustando o GL pra saber que agora ocupa toda tela
 	gl.viewport(0,0,350,250);
-
-	// setando a cor pra pintar a tela do canvas
-	gl.clearColor(0,0,0,1);
-	// limpa o canva inteiro usando a cor que setamos
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    var vertexShader = gl.createShader(gl.VERTEX_SHADER);
-    gl.shaderSource(vertexShader, vertexShaderText);
-    gl.compileShader(vertexShader);
+  twgl.setAttributePrefix("a_");
 
-    // para mostrar se ocorreu algum erro de compilação
-    if(!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)){
-        console.error("erro na compilação", gl.getShaderInfoLog(vertexShader));
-    }
+  const meshProgramInfo = twgl.createProgramInfo(gl, [vertexShaderText, fragmentShaderText]);
 
-    var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-    gl.shaderSource(fragmentShader, fragmentShaderText);
-    gl.compileShader(fragmentShader);
+  const bufferInfo = twgl.createBufferInfoFromArrays(gl, data);
+  const vao = twgl.createVAOFromBufferInfo(gl, meshProgramInfo, bufferInfo);
 
-    // para mostrar se ocorreu algum erro de compilação
-    if(!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)){
-        console.error("erro na compilação", gl.getShaderInfoLog(fragmentShader));
-        return;
-    }
+  const tex = twgl.createTexture(gl, {
+    src: "/resources/" + texturePath,
+  });
 
-    var program = gl.createProgram();
-    gl.attachShader(program, vertexShader);
-    gl.attachShader(program, fragmentShader);
+  const cameraTarget = [0, 0, 0];
+  const cameraPosition = [0, 0, 6];
+  const zNear = 0.1;
+  const zFar = 50;
 
-    // linkando o programa ao GL
-    gl.linkProgram(program);
+  twgl.resizeCanvasToDisplaySize(gl.canvas);
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-	var boxVertexBufferObject = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, boxVertexBufferObject);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(boxVertices), gl.STATIC_DRAW);
+  gl.enable(gl.DEPTH_TEST);
+  gl.enable(gl.CULL_FACE);
 
-	var boxIndexBufferObject = gl.createBuffer();
-	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, boxIndexBufferObject);
-	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(boxIndices), gl.STATIC_DRAW);
+  const fieldOfViewRadians = degToRad(60);
+  const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+  const projection = m4.perspective(fieldOfViewRadians, aspect, zNear, zFar);
 
-    var positionAttrLocation = gl.getAttribLocation(program, 'vertPosition');
-    var colorAttrLocation = gl.getAttribLocation(program, 'vertColor');
-    
-    gl.vertexAttribPointer(
-        positionAttrLocation,
-        3, // number of elements per attribute
-        gl.FLOAT, // type of elements
-        gl.FALSE, // data is normalized?
-        6 * Float32Array.BYTES_PER_ELEMENT, //size of individual element (cordenadas + 3 valores RGB vezes tamanho em bits de cada numero),
-        0, // the position of the first single vertex
-    )
-    
-    gl.vertexAttribPointer(
-        colorAttrLocation,
-        3,
-        gl.FLOAT,
-        gl.FALSE,
-        6 * Float32Array.BYTES_PER_ELEMENT,
-        3 * Float32Array.BYTES_PER_ELEMENT, // aqui as cores se iniciam no 3 elemento, pois precisamos pular ar cordenadas, entao pulamos 2 vezes tamanho do numero
-    )
-    
-    gl.enableVertexAttribArray(positionAttrLocation);
-    gl.enableVertexAttribArray(colorAttrLocation);
-    
-    // sinalizando openGL state machine que estamos usando esse programa
-    gl.useProgram(program);
+  const up = [0, 1, 0];
+  // Compute the camera's matrix using look at.
+  const camera = m4.lookAt(cameraPosition, cameraTarget, up);
 
-    // localização desses espaços na memória da GPU
-    var matWorldUniformLocation = gl.getUniformLocation(program, 'mWorld');
-    var matViewUniformLocation = gl.getUniformLocation(program, 'mView');
-    var matProjUniformLocation = gl.getUniformLocation(program, 'mProj');
-    
-    // criando matrizes só com zero
-    var worldMatrix = new Float32Array(16);
-    var viewMatrix = new Float32Array(16);
-    var projMatrix = new Float32Array(16);
-    
-    // criando a matrix identididade das matrizes acima
-    mat4.identity(worldMatrix);
+  // Make a view matrix from the camera matrix.
+  const view = m4.inverse(camera);
 
-    // criando a posição do viewer, como uma camêra
-    let view = -10;
-    mat4.lookAt(viewMatrix, [0,0,view], [0,0,0], [0,1,0]);
+  const sharedUniforms = {
+    u_lightDirection: m4.normalize([-1, 3, 5]),
+    u_view: view,
+    u_projection: projection,
+    u_world: m4.yRotation(14),
+    u_diffuse: [1, 0.7, 0.5, 1],
+    u_texture: tex,
+  };
+  
+  gl.useProgram(meshProgramInfo.program);
 
-    mat4.perspective(projMatrix, glMatrix.glMatrix.toRadian(45), canvas.width / canvas.height, 0.1, 1000.0);
-    
-    // agora vamos enviar essas matrizes para nosso shader
-    gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
-    gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, viewMatrix);
-    gl.uniformMatrix4fv(matProjUniformLocation, gl.FALSE, projMatrix)
+  twgl.setUniforms(meshProgramInfo, sharedUniforms);
 
-    gl.clearColor(0, 0, 0, 1);
-    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+  gl.bindVertexArray(vao);
+  
+  twgl.drawBufferInfo(gl, bufferInfo);
 
-    gl.enable(gl.CULL_FACE);
-    gl.enable(gl.DEPTH_TEST);
-    // desenhando os vertices no canva
-    gl.drawElements(gl.TRIANGLES, boxIndices.length, gl.UNSIGNED_SHORT, 0);
-
-    return {
-        canvas,
-        gl,
-        vertexShader,
-        fragmentShader,
-        worldMatrix,
-        viewMatrix,
-        matWorldUniformLocation,
-        matViewUniformLocation,
-        view,
-        requestId: null
-    }
+  return {
+    gl,
+    requestId: null,
+    view,
+    camera,
+    projection,
+    zNear,
+    zFar,
+    cameraTarget,
+    cameraPosition,
+    bufferInfo,
+    meshProgramInfo,
+    tex
+  }
 }
 
 function zoomIn(elementIndex){
-    let { gl, matViewUniformLocation, viewMatrix } = glContextArray[elementIndex];
-    glContextArray[elementIndex].view = glContextArray[elementIndex].view + 1;
-    gl.clearColor(0, 0, 0, 1);
-    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+  let { gl, bufferInfo, cameraPosition, meshProgramInfo, cameraTarget, projection } = glContextArray[elementIndex];
+  glContextArray[elementIndex].cameraPosition[2] = glContextArray[elementIndex].cameraPosition[2] - 1;
 
-    mat4.lookAt(viewMatrix, [0,0, glContextArray[elementIndex].view], [0,0,0], [0,1,0]);
-    gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, viewMatrix);
+  gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
 
-    gl.drawElements(gl.TRIANGLES, boxIndices.length, gl.UNSIGNED_SHORT, 0);
+  const camera = m4.lookAt(cameraPosition, cameraTarget, [0, 1, 0]);
+
+  const view = m4.inverse(camera);
+  
+  const sharedUniforms = {
+    u_lightDirection: m4.normalize([-1, 3, 5]),
+    u_view: view,
+    u_projection: projection,
+  };
+  
+  twgl.setUniforms(meshProgramInfo, sharedUniforms);
+
+  twgl.drawBufferInfo(gl, bufferInfo);
 }
 
 function zoomOut(elementIndex){
-    let { viewMatrix, gl, matViewUniformLocation } = glContextArray[elementIndex];
-    glContextArray[elementIndex].view = glContextArray[elementIndex].view - 1;
-    gl.clearColor(0, 0, 0, 1);
-    gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+  let { gl, bufferInfo, cameraPosition, meshProgramInfo, cameraTarget, projection } = glContextArray[elementIndex];
+  glContextArray[elementIndex].cameraPosition[2] = glContextArray[elementIndex].cameraPosition[2] + 1;
 
-    mat4.lookAt(viewMatrix, [0,0, glContextArray[elementIndex].view], [0,0,0], [0,1,0]);
-    gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, viewMatrix);
+  gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
 
-    gl.drawElements(gl.TRIANGLES, boxIndices.length, gl.UNSIGNED_SHORT, 0);
+  const camera = m4.lookAt(cameraPosition, cameraTarget, [0, 1, 0]);
+
+  const view = m4.inverse(camera);
+  
+  const sharedUniforms = {
+    u_lightDirection: m4.normalize([-1, 3, 5]),
+    u_view: view,
+    u_projection: projection,
+  };
+  
+  twgl.setUniforms(meshProgramInfo, sharedUniforms);
+
+  twgl.drawBufferInfo(gl, bufferInfo);
 }
