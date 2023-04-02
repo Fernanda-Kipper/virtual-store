@@ -42,58 +42,6 @@ var elementsArray = [
     }
 ];
 
-function moveObject(elementIndex){
-    let glElement = glContextArray[elementIndex];
-    initializeLoop(glElement);
-}
-
-function stopObject(elementIndex){
-  let { requestId } = glContextArray[elementIndex];
-  cancelAnimationFrame(requestId);
-}
-
-function zoomIn(){
-  let { gl, bufferInfo, cameraPosition, meshProgramInfo, cameraTarget, projection } = currentGlElement;
-  currentGlElement.cameraPosition[2] = currentGlElement.cameraPosition[2] - 1;
-
-  gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-
-  const camera = m4.lookAt(cameraPosition, cameraTarget, [0, 1, 0]);
-
-  const view = m4.inverse(camera);
-  
-  const sharedUniforms = {
-    u_lightDirection: m4.normalize([-1, 3, 5]),
-    u_view: view,
-    u_projection: projection,
-  };
-  
-  twgl.setUniforms(meshProgramInfo, sharedUniforms);
-
-  twgl.drawBufferInfo(gl, bufferInfo);
-}
-
-function zoomOut(){
-  let { gl, bufferInfo, cameraPosition, meshProgramInfo, cameraTarget, projection } = currentGlElement;
-  currentGlElement.cameraPosition[2] = currentGlElement.cameraPosition[2] - 1;
-
-  gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-
-  const camera = m4.lookAt(cameraPosition, cameraTarget, [0, 1, 0]);
-
-  const view = m4.inverse(camera);
-  
-  const sharedUniforms = {
-    u_lightDirection: m4.normalize([-1, 3, 5]),
-    u_view: view,
-    u_projection: projection,
-  };
-  
-  twgl.setUniforms(meshProgramInfo, sharedUniforms);
-
-  twgl.drawBufferInfo(gl, bufferInfo);
-}
-
 async function executeProgram(){
   for(let i = 0; i < elementsArray.length; i++){
     const canvaElement = elementsArray[i];
@@ -179,6 +127,58 @@ async function initializeCart(){
     
     twgl.drawBufferInfo(gl, bufferInfo);
   }
+}
+
+function moveObject(elementIndex){
+    let glElement = glContextArray[elementIndex];
+    initializeLoop(glElement);
+}
+
+function stopObject(elementIndex){
+  let { requestId } = glContextArray[elementIndex];
+  cancelAnimationFrame(requestId);
+}
+
+function zoomIn(){
+  let { gl, bufferInfo, cameraPosition, meshProgramInfo, cameraTarget, projection } = currentGlElement;
+  currentGlElement.cameraPosition[2] = currentGlElement.cameraPosition[2] - 1;
+
+  gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+
+  const camera = m4.lookAt(cameraPosition, cameraTarget, [0, 1, 0]);
+
+  const view = m4.inverse(camera);
+  
+  const sharedUniforms = {
+    u_lightDirection: m4.normalize([-1, 3, 5]),
+    u_view: view,
+    u_projection: projection,
+  };
+  
+  twgl.setUniforms(meshProgramInfo, sharedUniforms);
+
+  twgl.drawBufferInfo(gl, bufferInfo);
+}
+
+function zoomOut(){
+  let { gl, bufferInfo, cameraPosition, meshProgramInfo, cameraTarget, projection } = currentGlElement;
+  currentGlElement.cameraPosition[2] = currentGlElement.cameraPosition[2] - 1;
+
+  gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+
+  const camera = m4.lookAt(cameraPosition, cameraTarget, [0, 1, 0]);
+
+  const view = m4.inverse(camera);
+  
+  const sharedUniforms = {
+    u_lightDirection: m4.normalize([-1, 3, 5]),
+    u_view: view,
+    u_projection: projection,
+  };
+  
+  twgl.setUniforms(meshProgramInfo, sharedUniforms);
+
+  twgl.drawBufferInfo(gl, bufferInfo);
 }
 
 function initializeLoop(glElement){
