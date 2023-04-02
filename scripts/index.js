@@ -42,7 +42,7 @@ var elementsArray = [
     }
 ];
 
-async function executeProgram(){
+async function initializeHome(){
   for(let i = 0; i < elementsArray.length; i++){
     const canvaElement = elementsArray[i];
     const element = document.getElementById(canvaElement.id);
