@@ -23,6 +23,29 @@ body {
     padding: 24px;
 }
 
+.container header {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.container header nav button {
+    height: 40px;
+    width: 40px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+
+    color: white;
+    font-size: 24px;
+}
+
+.container header nav button svg path {
+    color: white;
+}
+
 h1 {
     color: white;
 
@@ -44,16 +67,27 @@ h1 {
 
 .container .content .element .btn-box {
     margin-top: 12px;
-}
-
-.container .content .element button {
-    border-radius: 12px;
+    border-radius: 0px 0px 8px 8px;
     border: none;
-    background-color: purple;
     color: white;
     padding: 8px 12px;
     font-weight: bold;
     cursor: pointer;
+    width: 100%;
+}
+
+.container .content .element:nth-of-type(2n) .btn-box{
+    background: rgb(131,58,180);
+    background: linear-gradient(90deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%);
+}
+
+.container .content .element:nth-of-type(2n + 1) .btn-box {
+    background: rgb(63,94,251);
+    background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(252,70,107,1) 100%);
+}
+
+.container .content .element .btn-box p {
+    font-weight: 500;
 }
 
 @media (min-width: 668px) {
@@ -68,4 +102,63 @@ h1 {
         grid-template-columns: repeat(3, 1fr);
         grid-template-rows: repeat(2, 1fr);
     }
+}
+
+.modal-overlay {
+    z-index: 9999;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background-color: rgba(0,0,0, 0.5);
+}
+
+.modal-overlay .modal-body {
+    background-color: #3e3e3f;
+    width: 80%;
+    height: 80%;
+
+    max-width: 600px;
+    max-height: 700px;
+
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
+}
+
+.modal-overlay .modal-body canvas {
+    width: 400px;
+    height: 400px;
+}
+
+.modal-overlay .modal-body h2 {
+    color: white;
+}
+
+.modal-overlay .modal-body .modal-btns {
+    display: flex;
+    align-items: center;
+    margin-top: 24px;
+}
+
+.modal-overlay .modal-body .modal-btns button {
+    padding: 12px;
+    border: none;
+    background: blueviolet;
+    border-radius: 8px;
+    color: white;
+    font-weight: 700;
+    margin-left: 8px;
+    cursor: pointer;
 }

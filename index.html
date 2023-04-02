@@ -12,55 +12,76 @@
 </head>
 <body onload="executeProgram()">
     <div class="container">
-        <h1>Seja bem vindo a Vitrine</h1>
+        <header>
+            <div></div>
+            <h1>Welcome to Store</h1>
+            <nav>
+                <button onclick="openCart()">
+                    <svg xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" viewBox="0 0 24 24" id="Basket"><path d="M14,18a1,1,0,0,0,1-1V15a1,1,0,0,0-2,0v2A1,1,0,0,0,14,18Zm-4,0a1,1,0,0,0,1-1V15a1,1,0,0,0-2,0v2A1,1,0,0,0,10,18ZM19,6H17.62L15.89,2.55a1,1,0,1,0-1.78.9L15.38,6H8.62L9.89,3.45a1,1,0,0,0-1.78-.9L6.38,6H5a3,3,0,0,0-.92,5.84l.74,7.46a3,3,0,0,0,3,2.7h8.38a3,3,0,0,0,3-2.7l.74-7.46A3,3,0,0,0,19,6ZM17.19,19.1a1,1,0,0,1-1,.9H7.81a1,1,0,0,1-1-.9L6.1,12H17.9ZM19,10H5A1,1,0,0,1,5,8H19a1,1,0,0,1,0,2Z" fill="white" class="color000000 svgShape"></path></svg>
+                </button>
+            </nav>
+        </header>
         <div class="content">
             <div class="element">
                 <canvas id="element-1"></canvas>
-                <div class="btn-box">
-                    <button onclick="zoomOut(0)">zoom out</button>
-                    <button onclick="zoomIn(0)">zoom in</button>
-                </div>
+                <button class="btn-box" onclick="openElement(0)">
+                    <b>Submachine Gun M24</b>
+                    <p>see more information</p>
+                </button>
             </div>
             <div class="element">
                 <canvas id="element-2"></canvas>
-                <div class="btn-box">
-                    <button onclick="zoomOut(1)">zoom out</button>
-                    <button onclick="zoomIn(1)">zoom in</button>
-                </div>
+                <button class="btn-box" onclick="openElement(1)">
+                    <b>Wood block</b>
+                    <p>see more information</p>
+                </button>
             </div>
             <div class="element">
                 <canvas id="element-3"></canvas>
-                <div class="btn-box">
-                    <button onclick="zoomOut(2)">zoom out</button>
-                    <button onclick="zoomIn(2)">zoom in</button>
-                </div>
+                <button class="btn-box" onclick="openElement(2)">
+                    <b>Submachine Gun M24</b>
+                    <p>see more information</p>
+                </button>
             </div>
             <div class="element">
                 <canvas id="element-4"></canvas>
-                <div class="btn-box">
-                    <button onclick="zoomOut(3)">zoom out</button>
-                    <button onclick="zoomIn(3)">zoom in</button>
-                </div>
+                <button class="btn-box" onclick="openElement(3)">
+                    <b>Diamond block</b>
+                    <p>see more information</p>
+                </button>
             </div>
             <div class="element">
                 <canvas id="element-5"></canvas>
-                <div class="btn-box">
-                    <button onclick="zoomOut(4)">zoom out</button>
-                    <button onclick="zoomIn(4)">zoom in</button>
-                </div>
+                <button class="btn-box" onclick="openElement(4)">
+                    <b>Submachine Gun M24</b>
+                    <p>see more information</p>
+                </button>
             </div>
             <div class="element">
                 <canvas id="element-6"></canvas>
-                <div class="btn-box">
-                    <button onclick="zoomOut(5)">zoom out</button>
-                    <button onclick="zoomIn(5)">zoom in</button>
-                </div>
+                <button class="btn-box" onclick="openElement(5)">
+                    <b>Iron Block</b>
+                    <p>see more information</p>
+                </button>
             </div>
         </div>
     </div>
-    <script src="parser.js"></script>
+    <div class="modal-overlay" id="modal" onclick="">
+        <div class="modal-body">
+            <h2 id="modal-title"></h2>
+            <canvas id="modal-canva"></canvas>
+            <div class="modal-btns">
+                <button onclick="zoomIn()">+</button>
+                <button onclick="zoomOut()">-</button>
+                <button onclick="addToCart()">add to cart</button>
+            </div>
+        </div>
+    </div>
+    <script src="./scripts/parser.js"></script>
+    <script src="./scripts/utils.js"></script>
+    <script src="./scripts/shaders.js"></script>
     <script src="https://webgl2fundamentals.org/webgl/resources/twgl-full.min.js"></script>
     <script src="https://webgl2fundamentals.org/webgl/resources/m4.js"></script>></script>
-    <script src="index.js"></script>
+    <script src="./scripts/index.js"></script>
 </body>
 </html>
