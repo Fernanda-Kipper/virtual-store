@@ -44,17 +44,17 @@ var elementsArray = [
 
 async function initializeHome(){
   for(let i = 0; i < elementsArray.length; i++){
-    const canvaElement = elementsArray[i];
-    const element = document.getElementById(canvaElement.id);
+    const element = elementsArray[i];
+    const htmlElement = document.getElementById(element.id);
 
-    const response = await fetch('/resources/' + canvaElement.obj);
+    const response = await fetch('/resources/' + element.obj);
     const text = await response.text();
     const data = parseOBJ(text);
 
-    element.addEventListener('mouseover', () => moveObject(i));
-    element.addEventListener('mouseout', () => stopObject(i));
+    htmlElement.addEventListener('mouseover', () => moveObject(i));
+    htmlElement.addEventListener('mouseout', () => stopObject(i));
 
-    glContextArray.push(elementFactory(canvaElement.id, canvaElement.texture, data, 350, 250));
+    glContextArray.push(elementFactory(element.id, element.texture, data, 350, 250));
   }
 }
 
