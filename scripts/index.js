@@ -1,4 +1,3 @@
-var elementsCartArray = [];
 var glContextArray = [];
 var loadedObjects = [];
 var currentElement = null;
@@ -58,18 +57,21 @@ async function initializeHome(){
   }
 }
 
-async function initializeCart(){
+async function initializeCart() {
   const { gl, canvas, meshProgramInfo } = createProgram("cart");
   let buffers = [];
+  let items = [];
 
-  canvas.width = 600;
+  canvas.width = window.innerWidth;
   canvas.height = 500;
 
-  gl.viewport(0,0,600,500);
+  gl.viewport(0, 0, window.innerWidth, 500);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+  twgl.setAttributePrefix("a_");
+
   const cameraTarget = [0, 1, 0];
-  const cameraPosition = [0, 0, 6];
+  const cameraPosition = [0, 0, 15];
   const zNear = 0.1;
   const zFar = 50;
 
@@ -80,15 +82,24 @@ async function initializeCart(){
   const camera = m4.lookAt(cameraPosition, cameraTarget, up);
   const view = m4.inverse(camera);
 
-  let cartElementsArray = JSON.parse(localStorage.getItem('cartElements'))
-  for(let i = 0; i < cartElementsArray.length; i++){
+  gl.enable(gl.DEPTH_TEST);
+  gl.enable(gl.CULL_FACE);
+
+  gl.useProgram(meshProgramInfo.program);
+
+  const cartElementsArray = JSON.parse(localStorage.getItem('cartElements'));
+  const elementsCount = cartElementsArray.length;
+  const elementWidth = 4;
+  const startOffset = -4;
+
+  for (let i = 0; i < elementsCount; i++) {
     const element = cartElementsArray[i];
     let bufferIndex = buffers.findIndex(buffer => buffer.name === element.obj);
 
-    if(bufferIndex < 0){
+    if (bufferIndex < 0) {
       const response = await fetch('/resources/' + element.obj);
       const text = await response.text();
-      data = parseOBJ(text);
+      const data = parseOBJ(text);
 
       const { vao, bufferInfo } = createBuffer(gl, data, meshProgramInfo);
       bufferIndex = buffers.push({
@@ -98,8 +109,8 @@ async function initializeCart(){
       }) - 1;
     }
 
-    let bufferInfo = buffers[bufferIndex].data;
-    let vao = buffers[bufferIndex].vao;
+    const bufferInfo = buffers[bufferIndex].data;
+    const vao = buffers[bufferIndex].vao;
 
     const tex = twgl.createTexture(gl, {
       src: "/resources/" + element.texture,
@@ -109,25 +120,48 @@ async function initializeCart(){
       u_lightDirection: m4.normalize([-1, 3, 5]),
       u_view: view,
       u_projection: projection,
-      u_world: m4.yRotation(14),
       u_diffuse: [1, 0.7, 0.5, 1],
       u_texture: tex,
     };
 
-    twgl.resizeCanvasToDisplaySize(gl.canvas);
-
-    gl.enable(gl.DEPTH_TEST);
-    gl.enable(gl.CULL_FACE);
-
-    gl.useProgram(meshProgramInfo.program);
-
+    twgl.setBuffersAndAttributes(gl, meshProgramInfo, bufferInfo);
     twgl.setUniforms(meshProgramInfo, sharedUniforms);
 
     gl.bindVertexArray(vao);
-    
+
+    items.push({
+      position: startOffset + (elementWidth * i),
+      texture: tex,
+      bufferInfo: bufferInfo
+    });
+
     twgl.drawBufferInfo(gl, bufferInfo);
   }
+
+  function loop() {
+    twgl.resizeCanvasToDisplaySize(gl.canvas);
+
+    for(let i = 0; i < items.length; i++){
+      let { position, texture, bufferInfo } = items[i];
+      let time = performance.now() / 1000 / 6 * 2 * Math.PI;  // convert to second
+      
+      const translation = m4.translation(position, 0, 0);
+      const rotation = m4.yRotation(time);
+      const u_world = m4.multiply(translation, rotation);
+    
+      twgl.setUniforms(meshProgramInfo, {
+        u_world,
+        u_texture: texture,
+      });
+    
+      twgl.drawBufferInfo(gl, bufferInfo);
+    }
+    requestAnimationFrame(loop);
+  }
+
+  requestAnimationFrame(loop);
 }
+
 
 function moveObject(elementIndex){
     let glElement = glContextArray[elementIndex];
@@ -298,9 +332,8 @@ async function openElement(elementIndex){
 }
 
 function addToCart(){
-  elementsArray = JSON.parse(localStorage.getItem("cartElements"))
-  elementsCartArray.push(currentElement);
-  console.log(currentElement, elementsArray)
+  let elementsCartArray = JSON.parse(localStorage.getItem("cartElements")) ?? []
+  elementsCartArray = [...elementsCartArray, currentElement];
   localStorage.setItem("cartElements", JSON.stringify(elementsCartArray));
   closeModal();
 }
