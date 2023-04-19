@@ -7,6 +7,18 @@
 
 ![](header.png)
 
+# Features
+
+- [x] Using obj
+- [x] Zoom
+- [x] Texture
+- [x] Adjust camera view to object views (calculus on world view matrix)
+- [x] Cart loading buffers for same objects just once
+- [ ] Rotation
+- [ ] Preset camera animation using curves
+- [ ] Dynamic Texture
+- [ ] Animated Background
+
 ## Development setup
 
 ```sh
